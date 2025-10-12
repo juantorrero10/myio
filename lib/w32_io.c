@@ -24,9 +24,13 @@ errno_t _win32_write(_FSTREAM* stream, _STRING* buff, DWORD bytesToWrite) {
     if ((r & (ST_FS_INVALIDHANDLE)) != 0) {
         return ST_FUNC_FSOBJ_INVALID;
     }
+
+    if (!(stream->fp & fp_write)) {
+        return ST_FUNC_ACCESS_DENIED;
+    }
     //UNSAFE!! only for testing
     if (bytesToWrite == UINT32_MAX) {
-        bytesToWrite = buff->sz;
+        bytesToWrite = (DWORD)buff->sz;
     }
 
     DWORD dwWritten;

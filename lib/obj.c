@@ -50,11 +50,11 @@ errno_t _init_fstream_obj(_FSTREAM* fs) {
     if (fs->b_std != 0 && (fs->w32_handle == NULL || fs->w32_handle == INVALID_HANDLE_VALUE)) {
         switch (fs->b_std) {
             case ao_stdin:
-                fs->w32_handle = GetStdHandle(W32_STDIN); break;
+                fs->w32_handle = GetStdHandle((DWORD)W32_STDIN); break;
             case ao_stdout:
-                fs->w32_handle = GetStdHandle(W32_STDOUT); break;
+                fs->w32_handle = GetStdHandle((DWORD)W32_STDOUT); break;
             case ao_stderr:
-                fs->w32_handle = GetStdHandle(W32_STDERR); break;
+                fs->w32_handle = GetStdHandle((DWORD)W32_STDERR); break;
             default:
                 return ST_FS_INVALIDTYPE;
         }

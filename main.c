@@ -15,6 +15,9 @@ int main(void) {
     //Stderr
     _fputs(_stderr, "some error!!!!\n");
 
+    //Try to write to _stdin
+    printf("fputs(_stdin) -> %d\n", _fputs(_stdin, "Not working!!"));
+
     //Writing to file, cursor
     fstream* f;
     printf("fopen -> %d\n", _fopen(&f, PATH, fp_write, fs_ascii));

@@ -48,7 +48,7 @@ errno_t _fputs(fstream *f, char *s) {
     i = _init_str_obj(str, s);
     
     if (i == ST_STR_NULLPTR) return ST_FUNC_STROBJ_INVALID;
-    i = _win32_write((_FSTREAM*)f, str, strlen(s));
+    i = _win32_write((_FSTREAM*)f, str, (DWORD)strlen(s));
     //Flush stdout if ends in newline
     if (i == ST_FUNC_OK) {
         if (str->str[str->sz - 1] == '\n')_fflush(_stdout);
