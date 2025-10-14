@@ -28,7 +28,7 @@ errno_t _win32_open(_Out_ _FSTREAM* stream, char * filePath, _FPERMIT fp) {
         if (fp & fp_write) access |= GENERIC_WRITE;
         cd = (fp & fp_create)? CREATE_NEW : OPEN_EXISTING;
         stream->w32_handle = CreateFileA(filePath, access, 0, NULL, cd, FILE_ATTRIBUTE_NORMAL, NULL);
-        return (stream->w32_handle == INVALID_HANDLE_VALUE)? ST_FUNC_ERROR : ST_FUNC_OK;
+        return (stream->w32_handle == INVALID_HANDLE_VALUE)? ST_FUNC_WINAPI_ERROR : ST_FUNC_OK;
     } return ST_FUNC_FSOBJ_INVALID;
 }
 
@@ -104,5 +104,19 @@ errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_
     if (i & (ST_STR_LENZERO | ST_STR_LENNOTUPDATED)) return ST_FUNC_STROBJ_INVALID;
 
 
+    return ST_FUNC_OK;
+}
+
+errno_t _win32_translate_error(DWORD e) {
+    switch (e){
+        case ERROR_FILE_NOT_FOUND:
+            return ST_FUNC_FILE_NOT_FOUND;
+        case ERROR_ACCESS_DENIED:
+            return ST_FUNC_ACCESS_DENIED;
+        case ERROR_SHARING_VIOLATION:
+            return ST_FUNC_ACCESS_DENIED;
+        default:
+            if (e != ERROR_SUCCESS) return ST_FUNC_WINAPI_ERROR;
+    }
     return ST_FUNC_OK;
 }

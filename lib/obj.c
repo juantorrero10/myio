@@ -74,14 +74,7 @@ errno_t _init_fstream_obj(_FSTREAM* fs) {
     else if (fs->b_std == ao_file) {
         if (fs->path == NULL) return ST_FS_INVALIDPATH;
         i = _win32_open(fs, fs->path, fs->fp);
-        if (i == ST_FUNC_ERROR) {
-            switch (GetLastError()){
-                case ERROR_FILE_NOT_FOUND:
-                    return ST_FS_FILENOTFOUND;
-                case ERROR_ACCESS_DENIED:
-                    return ST_FS_ACCESSDENIED;
-            }
-        }
+        if (i == ST_FUNC_WINAPI_ERROR)return _win32_translate_error(GetLastError());
         fs->b_init = 1;
 
     }
