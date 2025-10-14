@@ -1,7 +1,7 @@
 #include "myio.h"
 #include <stdio.h>
 
-#define PATH "test.txt"
+#define PATH "C:\\Users\\juan\\Desktop\\myio\\test.txt"
 
 int main(void) {
     //Test 0 length
@@ -23,7 +23,14 @@ int main(void) {
     printf("fopen -> %d\n", _fopen(&f, PATH, fp_write, fs_ascii));
     printf("fseek -> %d\n", _fseek(f, seek_set, 10));
     printf("fseek -> %d\n", _fseek(f, seek_cur, -4));
-    printf("fputs  -> %d\n", _fputs(f, "Hello world"));
+    printf("fputs  -> %d\n", _fputs(f, "hhhhhhhh"));
     _fclose(f);
-    return _puts("Hello world\n");
+
+    //Test read
+    fstream* f2;
+    printf("fopen -> %d\n", _fopen(&f2, PATH, fp_read, fs_ascii));
+    char *s;
+    printf("fgets -> %d, %s\n", _fgets(f2, &s, 10), s);
+
+    return _puts("shut up\n");
 }

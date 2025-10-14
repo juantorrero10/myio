@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define _myio_out_ 
+#define _out_ 
 
 typedef struct fstream fstream;
 
@@ -35,8 +35,9 @@ errno_t _puts(char * s);
 errno_t _fflush(fstream* f);
 errno_t _fclear(fstream* f);
 errno_t _fseek(fstream* f, seek_rel_type s, int64_t offset);
+errno_t _fgets(fstream *f, _out_ char** out, size_t amount);
 
-errno_t _fopen(_myio_out_ fstream **f, char *file_path , fpermit fp, fstype type);
+errno_t _fopen(_out_ fstream **f, char *file_path , fpermit fp, fstype type);
 errno_t _fclose(fstream *f);
 
 

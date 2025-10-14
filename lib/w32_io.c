@@ -6,15 +6,34 @@
 errno_t _win32_open(_Out_ _FSTREAM* stream, char * filePath, _FPERMIT fp) {
     DWORD access = 0;
     DWORD cd = 0;
-    if (fp & fp_read) access |= GENERIC_READ;
-    if (fp & fp_write) access |= GENERIC_WRITE;
-    cd = (fp & fp_create)? CREATE_NEW : OPEN_EXISTING;
-    stream->w32_handle = CreateFileA(filePath, access, 0, NULL, cd, FILE_ATTRIBUTE_NORMAL, NULL);
-    return (stream->w32_handle == INVALID_HANDLE_VALUE)? ST_FUNC_ERROR : ST_FUNC_OK;
+
+    //OPEN STANDARD FILE DESCRIPTORS
+    if (stream->b_std != 0) {
+        switch (stream->b_std) {
+            case ao_stdin:
+                stream->w32_handle = GetStdHandle((DWORD)W32_STDIN); break;
+            case ao_stdout:
+                stream->w32_handle = GetStdHandle((DWORD)W32_STDOUT); break;
+            case ao_stderr:
+                stream->w32_handle = GetStdHandle((DWORD)W32_STDERR); break;
+            default:
+                return ST_FS_INVALIDTYPE;
+        }
+        return (stream->w32_handle == INVALID_HANDLE_VALUE || !stream->w32_handle)? ST_FUNC_ERROR : ST_FUNC_OK;
+    }
+
+    //OPEN FILE
+    else {
+        if (fp & fp_read) access |= GENERIC_READ;
+        if (fp & fp_write) access |= GENERIC_WRITE;
+        cd = (fp & fp_create)? CREATE_NEW : OPEN_EXISTING;
+        stream->w32_handle = CreateFileA(filePath, access, 0, NULL, cd, FILE_ATTRIBUTE_NORMAL, NULL);
+        return (stream->w32_handle == INVALID_HANDLE_VALUE)? ST_FUNC_ERROR : ST_FUNC_OK;
+    } return ST_FUNC_FSOBJ_INVALID;
 }
 
 
-errno_t _win32_write(_FSTREAM* stream, _STRING* buff, DWORD bytesToWrite) {
+errno_t _win32_write(_FSTREAM* stream, _STRING* buff, uint32_t bytes_to_write) {
     //Check objects
     int r = _chk_str_obj(buff);
     if ((r & (ST_STR_LENZERO | ST_STR_NULLPTR | ST_STR_TOOBIG)) != 0) {
@@ -29,17 +48,19 @@ errno_t _win32_write(_FSTREAM* stream, _STRING* buff, DWORD bytesToWrite) {
         return ST_FUNC_ACCESS_DENIED;
     }
     //UNSAFE!! only for testing
-    if (bytesToWrite == UINT32_MAX) {
-        bytesToWrite = (DWORD)buff->sz;
+    if (bytes_to_write == UINT32_MAX) {
+        bytes_to_write = (uint32_t)buff->sz;
     }
 
     DWORD dwWritten;
-    r = (int)WriteFile(stream->w32_handle, buff->str, bytesToWrite, &dwWritten, NULL);
-    return r ^ 1;
+    r = (int)WriteFile(stream->w32_handle, buff->str, (DWORD)bytes_to_write, &dwWritten, NULL);
+    if (!r) return ST_FUNC_WINAPI_ERROR;
+    return ST_FUNC_OK;
 
 }
 
 errno_t _win32_seek(_FSTREAM* stream, _SEEK_REL_TYPE method, int64_t offset) {
+
     int r = _chk_fstream_obj(stream);
     if ((r & (ST_FS_INVALIDHANDLE)) != 0) {
         return ST_FUNC_FSOBJ_INVALID;
@@ -58,4 +79,28 @@ errno_t _win32_seek(_FSTREAM* stream, _SEEK_REL_TYPE method, int64_t offset) {
     r = SetFilePointerEx(stream->w32_handle, li, &new_pos, moveMethod);
     stream->seek = new_pos.QuadPart;
     return r ^ 1;
+}
+
+errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_buff, _out_ uint32_t* bytes_read) {
+    //Check and reset string obj
+    int i = _reset_str_obj(out_buff);
+    if (i == ST_STR_NULL) return ST_FUNC_STROBJ_INVALID;
+    i = _chk_str_obj(out_buff);
+    if (!(i & (ST_STR_NULLPTR | ST_STR_LENZERO)))return ST_FUNC_STROBJ_INVALID;
+
+    out_buff->str = malloc(bytes_to_read + 1);
+    if (!out_buff) return ST_FUNC_MEMORY_ERROR;
+    memset(out_buff->str, 0, bytes_to_read + 1);
+    //Check fstream object
+    i = _chk_fstream_obj(stream);
+    if ((i & (ST_FS_INVALIDHANDLE)))return ST_FUNC_FSOBJ_INVALID;
+    if (!(stream->fp & fp_read)) return ST_FS_ACCESSDENIED;
+
+    
+    i = (int)ReadFile(stream->w32_handle, out_buff->str, (DWORD)bytes_to_read, bytes_read, NULL);
+    if (!i) return ST_FUNC_WINAPI_ERROR;
+    i = _chk_str_obj(out_buff);
+    printf("-> %s \n", out_buff->str);
+    if (i & (ST_STR_LENZERO | ST_STR_LENNOTUPDATED)) return ST_FUNC_STROBJ_INVALID;
+    return ST_FUNC_OK;
 }

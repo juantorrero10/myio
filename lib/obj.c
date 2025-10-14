@@ -22,6 +22,17 @@ errno_t _chk_str_obj(_STRING* s) {
     return (s->sz > STR_MAX) ? ST_STR_TOOBIG : ST_STR_LENNOTUPDATED;
 }
 
+errno_t _reset_str_obj(_STRING* s) {
+    if (!s)return ST_STR_NULL;
+    else if (_chk_str_obj(s) != ST_STR_NULLPTR) {
+        free(s->str);
+        s->str = NULL;
+    }
+    s->sz = 0;
+    s->b_init = 1;
+    return ST_FS_OK;
+}
+
 errno_t _init_str_obj(_STRING* s, char* buff) {
     if (buff == NULL) {
         return ST_STR_NULLPTR;   
@@ -33,6 +44,7 @@ errno_t _init_str_obj(_STRING* s, char* buff) {
 }
 
 errno_t _chk_fstream_obj(_FSTREAM* fs) {
+    if (!fs) return ST_FS_NULL;
     if (fs->w32_handle == INVALID_HANDLE_VALUE || fs->w32_handle == NULL) {
 
         return ST_FS_INVALIDHANDLE;
@@ -47,20 +59,12 @@ errno_t _init_fstream_obj(_FSTREAM* fs) {
         return (i == ST_FS_OK)? ST_FS_NOTUPDATED : i;
     }
     //If File stream is std
-    if (fs->b_std != 0 && (fs->w32_handle == NULL || fs->w32_handle == INVALID_HANDLE_VALUE)) {
-        switch (fs->b_std) {
-            case ao_stdin:
-                fs->w32_handle = GetStdHandle((DWORD)W32_STDIN); break;
-            case ao_stdout:
-                fs->w32_handle = GetStdHandle((DWORD)W32_STDOUT); break;
-            case ao_stderr:
-                fs->w32_handle = GetStdHandle((DWORD)W32_STDERR); break;
-            default:
-                return ST_FS_INVALIDTYPE;
-        }
+    if (fs->b_std != 0) {
+        i = _win32_open(fs, NULL, fs->fp);
+        if (i != ST_FUNC_OK)return ST_FS_INVALIDHANDLE;
         fs->b_init = 1;
     }
-    else if (fs->b_std == ao_file && fs->w32_handle == NULL) {
+    else if (fs->b_std == ao_file) {
         if (fs->path == NULL) return ST_FS_INVALIDPATH;
         i = _win32_open(fs, fs->path, fs->fp);
         if (i == ST_FUNC_ERROR) {

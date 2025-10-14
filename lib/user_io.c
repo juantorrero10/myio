@@ -84,3 +84,23 @@ errno_t _fseek(fstream* f, _SEEK_REL_TYPE s, int64_t offset) {
     _FSTREAM* fs = (_FSTREAM*)f;
     return _win32_seek(fs, s, offset);
 }
+
+
+errno_t _fgets(fstream *f, _out_ char** out, size_t amount) {
+    if (!f) return ST_FUNC_FSOBJ_INVALID;
+    if (!out) return ST_FUNC_PTR_INVALID;
+    int i = 0;
+    i = _init_fstream_obj((_FSTREAM*)f);
+    if (i & (ST_FS_INVALIDHANDLE)) ST_FUNC_FSOBJ_INVALID;
+    _STRING* s = (_STRING*)malloc(sizeof(_STRING));
+    s->str = NULL;
+    s->b_init = 0;
+    s->sz = 0;
+
+    uint32_t read;
+    i = _win32_read((_FSTREAM*)f, (uint32_t)amount, s, &read);
+    if (i != ST_FUNC_OK) return i;
+    if (read != (uint32_t)amount) return ST_FUNC_ERROR;
+    *out = s->str;
+    return ST_FUNC_OK;
+}

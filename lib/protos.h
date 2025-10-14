@@ -4,11 +4,14 @@
 #define _out_
 
 /*-------------BACKEND------------------------------------*/
-errno_t _win32_write(_FSTREAM* stream, _STRING* buff, DWORD bytesToWrite);
+errno_t _win32_write(_FSTREAM* stream, _STRING* buff, uint32_t bytes_to_write);
+errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_buff, _out_ uint32_t* bytes_read);
 errno_t _win32_open(_out_ _FSTREAM* stream, char * filePath, _FPERMIT fp);
 errno_t _win32_seek(_FSTREAM* stream, _SEEK_REL_TYPE method, int64_t offset);
+
 errno_t _chk_str_obj(_STRING* s);
 errno_t _init_str_obj(_STRING* s, char* buff);
+errno_t _reset_str_obj(_STRING* s);
 errno_t _chk_fstream_obj(_FSTREAM* fs);
 errno_t _init_fstream_obj(_FSTREAM* fs);
 
