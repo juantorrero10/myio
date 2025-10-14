@@ -15,6 +15,11 @@ errno_t _reset_str_obj(_STRING* s);
 errno_t _chk_fstream_obj(_FSTREAM* fs);
 errno_t _init_fstream_obj(_FSTREAM* fs);
 
+/*-------GARBAGE COLLECING----------------------*/
+void _free_stream_objects(void);
+errno_t _myio_setup_gcollector(void);
+
+
 /*-------------FRONT END------------------------------------*/
 errno_t _fputs(fstream *f, char *s);
 errno_t _puts(char * s);

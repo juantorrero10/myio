@@ -52,7 +52,8 @@ errno_t _fputs(fstream *f, char *s) {
     //Flush stdout if ends in newline
     if (i == ST_FUNC_OK) {
         if (str->str[str->sz - 1] == '\n')_fflush(_stdout);
-    } return i;
+    } if (str) free(str); 
+    return i;
 }
 
 errno_t _puts(char * s) {
@@ -99,8 +100,14 @@ errno_t _fgets(fstream *f, _out_ char** out, size_t amount) {
 
     uint32_t read;
     i = _win32_read((_FSTREAM*)f, (uint32_t)amount, s, &read);
+    if (((_FSTREAM*)f)->b_std != 0){
+        _fflush(_stdin);
+        if (read < amount)s->str[s->sz - 2] = 0;
+    }
     if (i != ST_FUNC_OK) return i;
-    if (read != (uint32_t)amount) return ST_FUNC_ERROR;
     *out = s->str;
+    if (s) free(s);
     return ST_FUNC_OK;
 }
+
+errno_t _gets(_out_ char** out, size_t amount) {return _fgets(_stdin, out, amount);}

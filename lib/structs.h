@@ -44,6 +44,11 @@ typedef struct _FILE_STREAM {
 
 typedef _FSTREAM fstream;
 
+//GLOBALS
 extern fstream* _stdout;
 extern fstream* _stdin;
 extern fstream* _stderr;
+
+extern uint8_t gbool_initialized;
+
+

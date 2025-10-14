@@ -1,6 +1,6 @@
 #include "myio.h"
 #include <stdio.h>
-
+#include <string.h>
 #define PATH "C:\\Users\\juan\\Desktop\\myio\\test.txt"
 
 int main(void) {
@@ -30,7 +30,9 @@ int main(void) {
     fstream* f2;
     printf("fopen -> %d\n", _fopen(&f2, PATH, fp_read, fs_ascii));
     char *s;
-    printf("fgets -> %d, %s\n", _fgets(f2, &s, 10), s);
-
+    printf("fgets -> %d, %s\n", _fgets(f2, &s, 50), s);
+    char *s2;
+    printf("fgets -> %d\n", _fgets(_stdin, &s2, 10));
+    printf("\n_puts -> %d\n ", _puts(s2));
     return _puts("shut up\n");
 }

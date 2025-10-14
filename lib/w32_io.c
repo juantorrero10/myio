@@ -99,8 +99,10 @@ errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_
     
     i = (int)ReadFile(stream->w32_handle, out_buff->str, (DWORD)bytes_to_read, bytes_read, NULL);
     if (!i) return ST_FUNC_WINAPI_ERROR;
+
     i = _chk_str_obj(out_buff);
-    printf("-> %s \n", out_buff->str);
     if (i & (ST_STR_LENZERO | ST_STR_LENNOTUPDATED)) return ST_FUNC_STROBJ_INVALID;
+
+
     return ST_FUNC_OK;
 }

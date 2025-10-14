@@ -20,6 +20,7 @@ set(SOURCES
     lib/obj.c
     lib/user_io.c
     lib/w32_io.c
+    lib/free.c
 )
 
 # Build executable
