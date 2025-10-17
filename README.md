@@ -1,3 +1,8 @@
+## MYIO
+An inferior an annoying alternative to stdio for c.
+I left a small implementation (main.c) to show how to use it.
+
+
 ## 🧰 Requirements for compiling:
 - **CMake**
 - **Microsoft Visual Studio (MSVC)** or **Build Tools for Visual Studio**, although it may work with gcc
