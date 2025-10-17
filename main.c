@@ -1,7 +1,7 @@
 #include "myio.h"
 #include <stdio.h>
 #include <string.h>
-#define PATH "C:\\Users\\juan\\Desktop\\myio\\test.txt"
+#define PATH "C:\\Users\\<user>\\Deskto\\test.txt"
 
 int main(void) {
     //Test 0 length
