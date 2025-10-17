@@ -17,9 +17,10 @@ errno_t _reset_str_obj(_STRING* s);
 errno_t _chk_fstream_obj(_FSTREAM* fs);
 errno_t _init_fstream_obj(_FSTREAM* fs);
 
-/*-------GARBAGE COLLECING----------------------*/
-void _free_stream_objects(void);
+/*-------ARRAY FUNCS----------------------*/
 errno_t _myio_setup_gcollector(void);
+_FSTREAM* _alloc_fstream();
+void _free_stream_objects(void);
 
 
 /*-------------FRONT END------------------------------------*/

@@ -3,7 +3,7 @@
 #include "macros.h"
 #include "include.h"
 
-/*--------------STANDARD FILE DESCRIPTORS---------------*/
+/* OLD initializers
 _FSTREAM gfs_stdout = {NULL, fp_write, fs_ascii, 0, ao_stdout, 0};
 _FSTREAM gfs_stdin = {NULL, fp_read, fs_ascii, 0, ao_stdin, 0};
 _FSTREAM gfs_stderr = {NULL, fp_write, fs_ascii, 0, ao_stderr, 0};
@@ -11,8 +11,7 @@ _FSTREAM gfs_stderr = {NULL, fp_write, fs_ascii, 0, ao_stderr, 0};
 fstream* _stdout = (fstream*)&gfs_stdout;
 fstream* _stdin = (fstream*)&gfs_stdin;
 fstream* _stderr = (fstream*)&gfs_stderr;
-
-
+*/
 
 errno_t _chk_str_obj(_STRING* s) {
     if (s->str == NULL)return ST_STR_NULLPTR;
@@ -60,7 +59,7 @@ errno_t _init_fstream_obj(_FSTREAM* fs) {
 
     
     int i = 0;
-    if (!fs) return ST_FS_NULL; 
+    if (!fs || fs == FS_INVALID_PTR) return ST_FS_NULL; 
     if (fs->b_init) {
         i = _chk_fstream_obj(fs);
         return (i == ST_FS_OK)? ST_FS_NOTUPDATED : i;

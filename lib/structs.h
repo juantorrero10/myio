@@ -49,6 +49,4 @@ extern fstream* _stdout;
 extern fstream* _stdin;
 extern fstream* _stderr;
 
-extern uint8_t gbool_initialized;
-
 

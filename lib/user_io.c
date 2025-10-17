@@ -4,7 +4,7 @@
 #include "macros.h"
  
 errno_t _fopen(_myio_out_ fstream **f, char *file_path ,_FPERMIT fp, _FSTYPE type) {
-    _FSTREAM *fs = malloc(sizeof(_FSTREAM));
+    _FSTREAM *fs = _alloc_fstream();
     if (!fs) return ST_FUNC_MEMORY_ERROR;
 
     memset(fs, 0, sizeof(_FSTREAM));
@@ -30,16 +30,15 @@ errno_t _fclose(fstream* f) {
 
     if (fs->w32_handle)
         CloseHandle(fs->w32_handle);
-
-    free(fs);
+        f->w32_handle = NULL;
     return ST_FS_OK;
 }
 
 errno_t _fputs(fstream *f, char *s) {
-    if (!f || f == FS_INVALID_PTR) return ST_FS_NULL;
     _FSTREAM* fs = (_FSTREAM*)f;
     int i = 0;
     i = _init_fstream_obj(fs);
+    if (!f || f == FS_INVALID_PTR) return ST_FS_NULL;
     if (i & (ST_FS_INVALIDHANDLE)) 
         return ST_FUNC_FSOBJ_INVALID;
 
@@ -88,10 +87,10 @@ errno_t _fseek(fstream* f, _SEEK_REL_TYPE s, int64_t offset) {
 
 
 errno_t _fgets(fstream *f, _out_ char** out, size_t amount) {
-    if (!f) return ST_FUNC_FSOBJ_INVALID;
-    if (!out) return ST_FUNC_PTR_INVALID;
     int i = 0;
     i = _init_fstream_obj((_FSTREAM*)f);
+    if (!f) return ST_FUNC_FSOBJ_INVALID;
+    if (!out) return ST_FUNC_PTR_INVALID;
     if (i & (ST_FS_INVALIDHANDLE)) ST_FUNC_FSOBJ_INVALID;
     _STRING* s = (_STRING*)malloc(sizeof(_STRING));
     s->str = NULL;
