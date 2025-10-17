@@ -26,20 +26,30 @@ typedef enum _SEEK_REL_TYPE {
     seek_end
 }seek_rel_type;
 
-extern fstream* _stdout;
-extern fstream* _stdin;
-extern fstream* _stderr;
+#ifdef _WIN32
+  #ifdef MYIO_EXPORTS
+    #define MYIO_API __declspec(dllexport)
+  #else
+    #define MYIO_API __declspec(dllimport)
+  #endif
 
-errno_t _fputs(fstream *f, char *s);
-errno_t _puts(char * s);
-errno_t _fflush(fstream* f);
-errno_t _fclear(fstream* f);
-errno_t _fseek(fstream* f, seek_rel_type s, int64_t offset);
-errno_t _fgets(fstream *f, _out_ char** out, size_t amount);
-errno_t _gets(_out_ char** out, size_t amount);
+MYIO_API fstream* _stdout;
+MYIO_API fstream* _stdin;
+MYIO_API fstream* _stderr;
 
-errno_t _fopen(_out_ fstream **f, char *file_path , fpermit fp, fstype type);
-errno_t _fclose(fstream *f);
+MYIO_API errno_t _fputs(fstream *f, char *s);
+MYIO_API errno_t _puts(char * s);
+MYIO_API errno_t _fflush(fstream* f);
+MYIO_API errno_t _fclear(fstream* f);
+MYIO_API errno_t _fseek(fstream* f, seek_rel_type s, int64_t offset);
+MYIO_API errno_t _fgets(fstream *f, _out_ char** out, size_t amount);
+MYIO_API errno_t _gets(_out_ char** out, size_t amount);
 
+MYIO_API errno_t _fopen(_out_ fstream **f, char *file_path , fpermit fp, fstype type);
+MYIO_API errno_t _fclose(fstream *f);
+
+#else
+  #define MYIO_API
+#endif
 
 #endif //!MYIO_H

@@ -54,7 +54,7 @@ errno_t _chk_fstream_obj(_FSTREAM* fs) {
 }
 
 errno_t _init_fstream_obj(_FSTREAM* fs) {
-    /*Since you cant do anything without eventually landing in this function,
+    /* Since you cant do anything without eventually landing in this function,
      it is a good place to setup some things in the library*/
     _myio_setup_gcollector();
 

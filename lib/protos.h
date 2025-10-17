@@ -8,6 +8,8 @@ errno_t _win32_write(_FSTREAM* stream, _STRING* buff, uint32_t bytes_to_write);
 errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_buff, _out_ uint32_t* bytes_read);
 errno_t _win32_open(_out_ _FSTREAM* stream, char * filePath, _FPERMIT fp);
 errno_t _win32_seek(_FSTREAM* stream, _SEEK_REL_TYPE method, int64_t offset);
+errno_t _win32_translate_error(DWORD e);
+errno_t _win32_get_file_size(_FSTREAM *f, size_t* out_sz);
 
 errno_t _chk_str_obj(_STRING* s);
 errno_t _init_str_obj(_STRING* s, char* buff);
@@ -28,3 +30,4 @@ errno_t _fclear(fstream* f);
 errno_t _fseek(fstream* f, _SEEK_REL_TYPE s, int64_t offset);
 errno_t _fopen(_out_ fstream **f, char *file_path , _FPERMIT fp, _FSTYPE type);
 errno_t _fclose(fstream *f);
+errno_t _fwrite(fstream *f, char* s, uint8_t b_overwrite);

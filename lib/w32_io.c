@@ -11,11 +11,11 @@ errno_t _win32_open(_Out_ _FSTREAM* stream, char * filePath, _FPERMIT fp) {
     if (stream->b_std != 0) {
         switch (stream->b_std) {
             case ao_stdin:
-                stream->w32_handle = GetStdHandle((DWORD)W32_STDIN); break;
+                stream->w32_handle = GetStdHandle(STD_INPUT_HANDLE); break;
             case ao_stdout:
-                stream->w32_handle = GetStdHandle((DWORD)W32_STDOUT); break;
+                stream->w32_handle = GetStdHandle(STD_OUTPUT_HANDLE); break;
             case ao_stderr:
-                stream->w32_handle = GetStdHandle((DWORD)W32_STDERR); break;
+                stream->w32_handle = GetStdHandle(STD_ERROR_HANDLE); break;
             default:
                 return ST_FS_INVALIDTYPE;
         }
@@ -26,7 +26,7 @@ errno_t _win32_open(_Out_ _FSTREAM* stream, char * filePath, _FPERMIT fp) {
     else {
         if (fp & fp_read) access |= GENERIC_READ;
         if (fp & fp_write) access |= GENERIC_WRITE;
-        cd = (fp & fp_create)? CREATE_NEW : OPEN_EXISTING;
+        cd = (fp & fp_create)? OPEN_ALWAYS : OPEN_EXISTING;
         stream->w32_handle = CreateFileA(filePath, access, 0, NULL, cd, FILE_ATTRIBUTE_NORMAL, NULL);
         return (stream->w32_handle == INVALID_HANDLE_VALUE)? ST_FUNC_WINAPI_ERROR : ST_FUNC_OK;
     } return ST_FUNC_FSOBJ_INVALID;
@@ -116,7 +116,20 @@ errno_t _win32_translate_error(DWORD e) {
         case ERROR_SHARING_VIOLATION:
             return ST_FUNC_ACCESS_DENIED;
         default:
-            if (e != ERROR_SUCCESS) return ST_FUNC_WINAPI_ERROR;
+            if (e != ERROR_SUCCESS) {
+                printf("undocumented winapi error: %lX\n", GetLastError());
+                return ST_FUNC_WINAPI_ERROR;
+            }
     }
     return ST_FUNC_OK;
+}
+
+errno_t _win32_get_file_size(_FSTREAM *f, size_t* out_sz) {
+    int i = _chk_fstream_obj(f);
+    if (i & (ST_FS_INVALIDHANDLE | ST_FS_NULL)) return ST_FUNC_FSOBJ_INVALID;
+    LARGE_INTEGER li;
+    if (!GetFileSizeEx(f->w32_handle, &li)) {
+        return _win32_translate_error(GetLastError());
+    }
+    *out_sz = (size_t)li.QuadPart; return ST_FS_OK;
 }
