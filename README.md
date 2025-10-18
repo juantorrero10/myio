@@ -1,5 +1,5 @@
 ## MYIO
-An inferior an annoying alternative to stdio for c.
+An inferior and annoying alternative to stdio for c.
 I left a small implementation (main.c) to show how to use it.
 
 
