@@ -117,6 +117,8 @@ errno_t _win32_translate_error(DWORD e) {
             return ST_FUNC_ACCESS_DENIED;
         case ERROR_INVALID_NAME:
             return ST_FUNC_FILE_NOT_FOUND;
+        case ERROR_PATH_NOT_FOUND:
+            return ST_FUNC_FILE_NOT_FOUND;
         default:
             if (e != ERROR_SUCCESS) {
                 printf("undocumented winapi error: %lX\n", GetLastError());
