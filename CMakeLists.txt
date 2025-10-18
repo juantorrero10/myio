@@ -22,6 +22,7 @@ add_library(myio SHARED
     lib/user_io.c
     lib/w32_io.c
     lib/free.c
+    lib/format_io.c
 )
 
 # Define MYIO_EXPORTS inside the DLL so __declspec(dllexport) is active
