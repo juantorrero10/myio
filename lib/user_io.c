@@ -15,7 +15,6 @@ errno_t _fopen(_myio_out_ fstream **f, char *file_path ,_FPERMIT fp, _FSTYPE typ
 
     errno_t err = _init_fstream_obj(fs);
     if (err != ST_FS_OK) {
-        free(fs);
         *f = FS_INVALID_PTR;
         return err;
     }
@@ -91,7 +90,7 @@ errno_t _fgets(fstream *f, _out_ char** out, size_t amount) {
     i = _init_fstream_obj((_FSTREAM*)f);
     if (!f) return ST_FUNC_FSOBJ_INVALID;
     if (!out) return ST_FUNC_PTR_INVALID;
-    if (i & (ST_FS_INVALIDHANDLE)) ST_FUNC_FSOBJ_INVALID;
+    if (i & (ST_FS_INVALIDHANDLE | ST_FS_NULL)) return ST_FUNC_FSOBJ_INVALID;
     _STRING* s = (_STRING*)malloc(sizeof(_STRING));
     s->str = NULL;
     s->b_init = 0;

@@ -93,7 +93,7 @@ errno_t _win32_read(_FSTREAM* stream, uint32_t bytes_to_read,_out_ _STRING* out_
     memset(out_buff->str, 0, bytes_to_read + 1);
     //Check fstream object
     i = _chk_fstream_obj(stream);
-    if ((i & (ST_FS_INVALIDHANDLE)))return ST_FUNC_FSOBJ_INVALID;
+    if ((i & (ST_FS_INVALIDHANDLE | ST_FS_NULL)))return ST_FUNC_FSOBJ_INVALID;
     if (!(stream->fp & fp_read)) return ST_FS_ACCESSDENIED;
 
     
@@ -115,6 +115,8 @@ errno_t _win32_translate_error(DWORD e) {
             return ST_FUNC_ACCESS_DENIED;
         case ERROR_SHARING_VIOLATION:
             return ST_FUNC_ACCESS_DENIED;
+        case ERROR_INVALID_NAME:
+            return ST_FUNC_FILE_NOT_FOUND;
         default:
             if (e != ERROR_SUCCESS) {
                 printf("undocumented winapi error: %lX\n", GetLastError());

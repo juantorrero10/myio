@@ -28,22 +28,25 @@ errno_t _array_relocate() {
     if (((array_size + gbool_initalized) % ARRAY_CHUNK) != 0)
         return ST_FUNC_NO_ACTION;
 
+    puts("Array relocation!!");
+
     //Allocation attempt -> Linear allocation
-    size_t new_byte_size = (sizeof(_FSTREAM) * (array_size + 1)) + ARRAY_CHUNK;
+    size_t new_byte_size = (sizeof(_FSTREAM) * (array_size + 1 + ARRAY_CHUNK));
     _FS_ARRAY temp = malloc(new_byte_size);
     if (!temp) return ST_FUNC_MEMORY_ERROR;
 
     //Set to 0
     memset(temp, 0, new_byte_size);
-
+    printf("array: %llX\n", array);
     //Copy everything
     if (array) memcpy(temp, array, (array_size + 1) * sizeof(_FSTREAM));
 
     //Free old array
-    free(array);
+    if (array) free(array);
 
     //Set the array pointer to the new one
     array = temp;
+    printf("New array: %llX\n", array);
     return ST_FUNC_OK;
 }
 
@@ -52,11 +55,12 @@ _FSTREAM* _alloc_fstream() {
     _FSTREAM *f = FS_INVALID_PTR;
 
     //If array needs relocation
-    if (((array_size + 1) % ARRAY_CHUNK) == 0)
+    if (((array_size + 1) % ARRAY_CHUNK) == 0) {
         i = _array_relocate();
         if (i != ST_FUNC_OK) {
             return f;
         }
+    }
 
     f = array + array_size++;
     return f; 

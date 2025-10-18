@@ -45,7 +45,7 @@ errno_t _init_str_obj(_STRING* s, char* buff) {
 }
 
 errno_t _chk_fstream_obj(_FSTREAM* fs) {
-    if (!fs) return ST_FS_NULL;
+    if (!fs || fs == FS_INVALID_PTR) return ST_FS_NULL;
     if (fs->w32_handle == INVALID_HANDLE_VALUE || fs->w32_handle == NULL) {
 
         return ST_FS_INVALIDHANDLE;

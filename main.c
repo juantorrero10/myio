@@ -1,7 +1,7 @@
 #include "myio.h"
 #include <stdio.h>
 #include <string.h>
-#define PATH "C:\\Users\\<user>\\Desktop\\test.txt"
+#define PATH "C:\\Users\\user\\Desktop\\myio\\test.txt"
 
 int main(void) {
     //Test 0 length
@@ -31,8 +31,21 @@ int main(void) {
     char *s;
     printf("fgets -> %d, %s\n", _fgets(f2, &s, 50), s);
     _fclose(f2);
-    /* char *s2;
+    /*char *s2;
     printf("fgets -> %d\n", _fgets(_stdin, &s2, 10));
-    printf("\n_puts -> %d\n ", _puts(s2)); */
+    printf("\n_puts -> %d\n", _puts(s2));
+    */
+    //relocation_test
+    for (size_t i = 0; i < 16; i++)
+    {
+        fstream* f = NULL;
+        _fopen(&f, PATH, fp_write, fs_ascii);
+        _fclose(f);
+    }
+    
+    printf("fopen -> %d\n", _fopen(&f2, PATH, fp_read, fs_ascii));
+    printf("fgets -> %d, %s\n", _fgets(f2, &s, 5), s);
+    _fclose(f2);
+
     return _puts("shut up\n");
 }
