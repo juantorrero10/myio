@@ -18,7 +18,7 @@ private errno_t _vfprintf(fstream *f, char *fmt, va_list args) {
 errno_t _fprintf(fstream* f, char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    errno_t e = _vfprintf(f, FMTID_NULL, va_list);
+    errno_t e = _vfprintf(f, fmt, args);
     va_end(args);
     return e;
 }
@@ -27,7 +27,7 @@ errno_t _fprintf(fstream* f, char *fmt, ...) {
 errno_t _printf(char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    errno_t e = _vfprintf(_stdout, fmt, va_list);
+    errno_t e = _vfprintf(_stdout, fmt, args);
     va_end(args);
     return e;
 }
