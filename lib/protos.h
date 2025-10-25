@@ -32,3 +32,5 @@ errno_t _fseek(fstream* f, _SEEK_REL_TYPE s, int64_t offset);
 errno_t _fopen(_out_ fstream **f, char *file_path , _FPERMIT fp, _FSTYPE type);
 errno_t _fclose(fstream *f);
 errno_t _fwrite(fstream *f, char* s, uint8_t b_overwrite);
+errno_t _fputc(fstream* f,char c);
+errno_t _putc(char c);

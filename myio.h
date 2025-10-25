@@ -48,6 +48,9 @@ MYIO_API errno_t _gets(_out_ char** out, size_t amount);
 MYIO_API errno_t _fopen(_out_ fstream **f, char *file_path , fpermit fp, fstype type);
 MYIO_API errno_t _fclose(fstream *f);
 
+MYIO_API errno_t _printf(char* fmt, ...);
+MYIO_API errno_t _fprintf(fstream* f, char *fmt, ...);
+
 #else
   #define MYIO_API
 #endif

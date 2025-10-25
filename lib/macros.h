@@ -1,5 +1,6 @@
-#define _myio_out_ 
-
+#define _out_
+#define private 
+#define Bool uint8_t
 /*------------w32----------------*/
 #define W32_STDIN -10
 #define W32_STDOUT -11

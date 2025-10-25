@@ -1,7 +1,9 @@
 #include "myio.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#define PATH "C:\\Users\\user\\Desktop\\myio\\test.txt"
+#include <math.h> //NAN and Infinty
+#define PATH "C:\\Users\\juan\\Desktop\\myio\\test.txt"
 
 int main(void) {
     //Test 0 length
@@ -42,10 +44,24 @@ int main(void) {
         _fopen(&f, PATH, fp_write, fs_ascii);
         _fclose(f);
     }
-    
-    printf("fopen -> %d\n", _fopen(&f2, PATH, fp_read, fs_ascii));
+    fstream* f3;
+    printf("fopen -> %d\n", _fopen(&f3, PATH, fp_read, fs_ascii));
     printf("fgets -> %d, %s\n", _fgets(f2, &s, 5), s);
-    _fclose(f2);
+    _fclose(f3);
+
+    //PRINTF TESTING
+    _printf("PRINTF TESTING: %010ld %d %hhd %2hhu %c %s\n", -2UL, 4UL, (uint8_t)255, (uint8_t)255, 'c', "string");
+    _printf("Floats: %4.03f %llf %f %f\n", -93842.474849f, NAN, -INFINITY, 0.0f);
+
+    _printf("MEMDUMP in test.txt: \n");
+    fstream* memdump; _fopen(&memdump, PATH, fp_write, fs_ascii);
+    _fseek(memdump, seek_set, 15); _fputs(memdump, "\n\n");
+    //For memory dumping
+    char* buff2 = malloc(64);
+    for (int i = 0; i < 64; i++) {
+        if (!(i%8) && i) _fprintf(memdump, "\n");
+        _fprintf(memdump, "%2hhX ", buff2[i]);
+    } free(buff2);
 
     return _puts("shut up\n");
 }

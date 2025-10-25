@@ -22,13 +22,11 @@ fstream* _stderr = NULL;
 uint8_t gbool_initalized = 0;  //Bool
 
 //Relocate and resize the array
-errno_t _array_relocate() {
+private errno_t _array_relocate() {
     
     //Sanity check
     if (((array_size + gbool_initalized) % ARRAY_CHUNK) != 0)
         return ST_FUNC_NO_ACTION;
-
-    puts("Array relocation!!");
 
     //Allocation attempt -> Linear allocation
     size_t new_byte_size = (sizeof(_FSTREAM) * (array_size + 1 + ARRAY_CHUNK));
@@ -37,7 +35,7 @@ errno_t _array_relocate() {
 
     //Set to 0
     memset(temp, 0, new_byte_size);
-    printf("array: %llX\n", array);
+    
     //Copy everything
     if (array) memcpy(temp, array, (array_size + 1) * sizeof(_FSTREAM));
 
@@ -46,7 +44,13 @@ errno_t _array_relocate() {
 
     //Set the array pointer to the new one
     array = temp;
-    printf("New array: %llX\n", array);
+
+    if (gbool_initalized) {
+        _stdout = &array[0];
+        _stdin = &array[1];
+        _stderr = &array[2];
+    }
+
     return ST_FUNC_OK;
 }
 
@@ -66,7 +70,7 @@ _FSTREAM* _alloc_fstream() {
     return f; 
 }
 
-void _free_stream_objects(void) {
+private void _free_stream_objects(void) {
     /* ... */
     for (size_t i = 0; i < array_size; i++)
     {

@@ -3,7 +3,7 @@
 #include "structs.h"
 #include "macros.h"
  
-errno_t _fopen(_myio_out_ fstream **f, char *file_path ,_FPERMIT fp, _FSTYPE type) {
+errno_t _fopen(_out_ fstream **f, char *file_path ,_FPERMIT fp, _FSTYPE type) {
     _FSTREAM *fs = _alloc_fstream();
     if (!fs) return ST_FUNC_MEMORY_ERROR;
 
@@ -58,6 +58,12 @@ errno_t _puts(char * s) {
     return _fputs(_stdout, s);
 }
 
+errno_t _fputc(fstream* f,char c) {
+    char b[2] = {c, 0};
+    return _fputs(f, b);
+}
+
+errno_t _putc(char c) {return _fputc(_stdout, c);}
 
 errno_t _fflush(fstream* f) {
     _FSTREAM* fs = (_FSTREAM*)f;
