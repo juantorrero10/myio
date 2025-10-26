@@ -1,6 +1,7 @@
 #include "include.h"
 #include "macros.h"
 #include "structs.h"
+#include "protos.h"
 
 #define ARRAY_CHUNK 16
 
@@ -83,15 +84,14 @@ private void _free_stream_objects(void) {
 }
 
 /*
-*   This funcion is essentialy a initializer of the whole library.
-*   Its called from another function which is essential to all functionality
-*   so its garanteed to be called before doing anything.
+*   This funcion is initializer of the library.
+*   Called from DllMain(), so its called before doing anything
 *   
 *   Among other things, it setups the main array of fstream objects
 *   that has the sole purpose of being a garbage collector for when
 *   the program its terminated.
 */
-errno_t _myio_setup_gcollector(void) {
+private errno_t _myio_setup_gcollector(void) {
     if (gbool_initalized) return ST_FUNC_NO_ACTION;
 
     //Initialize array
@@ -114,6 +114,22 @@ errno_t _myio_setup_gcollector(void) {
     _stderr->b_std=ao_stderr;_stderr->w32_handle = NULL; _stderr->b_init = 0;
     _stderr->fp=fp_write;_stderr->fs=fs_ascii;_stderr->path=NULL,_stderr->seek=0;
 
+    //For some reason, this is necessary
+    _fflush(_stdout);_fflush(_stdin);_fflush(_stderr);_puts("");
+
     //Add the free routine to a list of routines that executes after main()
     atexit(_free_stream_objects);
+}
+
+//Set up the library
+BOOL WINAPI DllMain(
+    HINSTANCE hinstDLL,
+    DWORD fdwReason,  
+    LPVOID lpvReserved )
+{
+    if(fdwReason == DLL_PROCESS_ATTACH) {
+        _myio_setup_gcollector();   //Init library
+        _puts("");                  //Calling a empty puts to finish initializing
+    }
+    return TRUE;
 }

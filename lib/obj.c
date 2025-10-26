@@ -13,6 +13,7 @@ fstream* _stdin = (fstream*)&gfs_stdin;
 fstream* _stderr = (fstream*)&gfs_stderr;
 */
 
+
 errno_t _chk_str_obj(_STRING* s) {
     if (s->str == NULL)return ST_STR_NULLPTR;
     if (!s->b_init || s->sz == STR_NULL_LEN){
@@ -53,11 +54,7 @@ errno_t _chk_fstream_obj(_FSTREAM* fs) {
 }
 
 errno_t _init_fstream_obj(_FSTREAM* fs) {
-    /* Since you cant do anything without eventually landing in this function,
-     it is a good place to setup some things in the library*/
-    _myio_setup_gcollector();
 
-    
     int i = 0;
     if (!fs || fs == FS_INVALID_PTR) return ST_FS_NULL; 
     if (fs->b_init) {
@@ -77,6 +74,7 @@ errno_t _init_fstream_obj(_FSTREAM* fs) {
         fs->b_init = 1;
 
     }
+    _puts("");
     return ST_FS_OK;
 }
 
