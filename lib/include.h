@@ -10,5 +10,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
+#include <stdbool.h>
 
 #endif //!INCLUDE_H

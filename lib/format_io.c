@@ -3,20 +3,17 @@
 #include "structs.h"
 #include "include.h"
 
-
-
-#include <stdarg.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-
 #define BUFF_SIZE 32
 #define private static
 
+/**
+ * @brief Get next argument on the list.
+ * @return `uint64_t` just represents an array of 64bits, can be signed, unsigned, float or integer.
+*/
 private uint64_t fetch_arg(va_list* args, uint8_t byteLen, bool bFloat) {
     //Note that all arguments get "promoted" to 32bit 
     uint64_t ret = 0; double t = 0;
-    if (bFloat) {
+    if (bFloat) {       
         t = va_arg(*args, double);
         return *(uint64_t*)&t;
     }
@@ -30,6 +27,19 @@ private uint64_t fetch_arg(va_list* args, uint8_t byteLen, bool bFloat) {
     } return ret;
 }
 
+/*!
+ * @brief Integer to ASCII
+ * @param value     64bit array.
+ * @param radix     Number base for conversion to ASCII
+ * @param byteLen   8, 4, 2, or 1 -> number of bytes.
+ * @param intCap    Max number of digits and left padding with '0'.
+ * ----Bool flags--
+ * @param bSigned    Signed/unsigned flag
+ * @param bUpperCase Uppercase or Lowercase ABCDEF for hexadecimal
+ * @param buff      Pointer to Output buffer.
+ * 
+ * @return Length of string.
+ */
 private size_t __itoa(
     uint64_t value, uint8_t radix, uint8_t byteLen, int32_t intCap,
     bool bSigned, bool bUppercase, char* buff
@@ -78,21 +88,21 @@ private size_t __itoa(
     uint8_t rem; int i = 0;
     bool nolimit = intCap == -1;
     if (nolimit) intCap = INT32_MAX;
-    int32_t cIntCap = intCap;
-    while (cvalue && cIntCap--) {
+
+    while (cvalue && intCap--) {
         rem = cvalue % radix;
         cvalue /= radix;
         buff[i++] = lookup[rem];
     }
 
     //FIll rest with zeros
-    const int32_t ci = i;
-    if (!nolimit && ((intCap - ci) > 0)) {
-        for (int x = 0; x < (intCap - ci); x++) {
+    if (!nolimit && (intCap > 0)) {
+        for (int x = 0; x < intCap; x++) {
             buff[i++] = '0';
         }
     }
 
+    //Add minus sign and reverse the string
     if (finalSign) buff[i++] = '-';
     strrev(buff);
     return (size_t)i;
@@ -167,20 +177,20 @@ private void __ftoa(double value, uint8_t precision, int32_t intCap, char *buff)
     buff[len] = '\0';
 }
 
-/*s
- * Implementation of printf through a state machine...
+/**
+ * @brief Implementation of printf through a state machine.
  *
- * Format examples:
- * %ld:
- * --------> A 32-bit signed integer shown in decimal.
- *
- * %02hhX
- * --------> An byte shown in uppercase hexadecimal with a 2 integer cap
- *          (Fills left digit with '0' if its value is zero)
- *
- * %10.2llf.
- * --------> An 8-byte float (double) number capped to 10 digits in the integer part
- *           and capped to 2 digits in the decimal part.
+ * @param f    Output file decriptor
+ * @param fmt  Format string
+ * @param args Variadic argument list
+ * 
+ * Supported format features:
+ *  - Length modifiers: `h`, `hh`, `l`, `ll`
+ *  - Integer formats: `i`, `d`, `u`, `o`, `b`, `x`, `X`
+ *  - Floating formats: `f`, `%llf` for doubles
+ *  - Integer and decimal caps: `%ii.ddf`
+ * 
+ * @todo Proper error return codes
  */
 private errno_t _vsfprintf(fstream* f, char* fmt, va_list* args) {
     
@@ -200,11 +210,11 @@ Init: //Set default values
     uint8_t Initctrl1 = 0, Initctrl2 = 0;
 //State machine
 Normal:
-    switch(*ptr) {
-        case 0:goto exit;
-        case '%':
+    switch(*ptr) {                  //*ptr -> current character of the format
+        case 0:goto exit;           //Null terminated case
+        case '%':                   //User specified a format
             ptr++; goto LenStage1;
-        default:
+        default:                    //Print char like normal
             _fputc(f, *(ptr++)); goto Normal;
     }
 
@@ -285,16 +295,19 @@ ValStage:
     }
 
 
-PrintValue:
-    uint64_t val = fetch_arg(args, byteLen, bFloat);
+PrintValue:    //Format specfies a number.
+    uint64_t val = fetch_arg(args, byteLen, bFloat);    //Get next argument
+
+    //Convert to ASCII
     if (!bFloat)__itoa(val, radix, byteLen, intCap, bSigned, bUppercase, buff);
     else __ftoa(*(double*)&val, decPrecision, intCap, buff);
-    _fputs(f, buff);
-    ptr++;
-    goto Init;
 
-PrintText:
-    if (bString) printf("%s", va_arg(*args, const char*));
+    _fputs(f, buff);    //Output to screen
+    ptr++;
+    goto Init;          //Back to Init state
+
+PrintText:  //Format specfies a character or string
+    if (bString) _fputs(f, va_arg(*args, const char*));
     else {
         char c = (char)va_arg(*args, uint32_t);
         _fputc(f, c);
@@ -306,6 +319,8 @@ exit:
     return ST_FUNC_OK;
 }
 
+
+//Wrapper for _vsfprintf()
 errno_t _fprintf(fstream* f, char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -314,7 +329,7 @@ errno_t _fprintf(fstream* f, char *fmt, ...) {
     return e;
 }
 
-
+//Wrapper for _vsfprintf()
 errno_t _printf(char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
